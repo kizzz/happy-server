@@ -1,0 +1,6 @@
+# Set default handling for text files
+* text=auto
+
+# Keep script files on consistent endings
+*.ps1 text eol=crlf
+*.sh text eol=lf
