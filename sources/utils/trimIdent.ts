@@ -1,6 +1,6 @@
 export function trimIdent(text: string): string {
-    // Split the text into an array of lines
-    const lines = text.split('\n');
+    // Normalize Windows-style line endings before splitting
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
 
     // Remove leading and trailing empty lines
     while (lines.length > 0 && lines[0].trim() === '') {
