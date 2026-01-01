@@ -11,6 +11,9 @@ import { startDatabaseMetricsUpdater } from "@/app/monitoring/metrics2";
 import { initEncrypt } from "./modules/encrypt";
 import { initGithub } from "./modules/github";
 import { loadFiles } from "./storage/files";
+import { JobAssignmentService } from "./app/services/jobAssignmentService";
+import { JobTimeoutService } from "./app/services/jobTimeoutService";
+import { JobRetryService } from "./app/services/jobRetryService";
 
 async function main() {
 
@@ -38,6 +41,25 @@ async function main() {
     await startMetricsServer();
     startDatabaseMetricsUpdater();
     startTimeout();
+
+    // Start job services
+    const jobAssignmentService = new JobAssignmentService();
+    jobAssignmentService.start(10000); // Run every 10 seconds
+    onShutdown('job-assignment', async () => {
+        jobAssignmentService.stop();
+    });
+
+    const jobTimeoutService = new JobTimeoutService();
+    jobTimeoutService.start(60000); // Run every minute
+    onShutdown('job-timeout', async () => {
+        jobTimeoutService.stop();
+    });
+
+    const jobRetryService = new JobRetryService();
+    jobRetryService.start(60000); // Run every minute
+    onShutdown('job-retry', async () => {
+        jobRetryService.stop();
+    });
 
     //
     // Ready

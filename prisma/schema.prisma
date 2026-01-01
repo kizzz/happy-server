@@ -52,6 +52,7 @@ model Account {
     AccessKey           AccessKey[]
     UserFeedItem        UserFeedItem[]
     UserKVStore         UserKVStore[]
+    Job                 Job[]
 }
 
 model TerminalAuthRequest {
@@ -108,6 +109,7 @@ model Session {
     messages          SessionMessage[]
     usageReports      UsageReport[]
     accessKeys        AccessKey[]
+    jobs              Job[]
 
     @@unique([accountId, tag])
     @@index([accountId, updatedAt(sort: Desc)])
@@ -360,4 +362,55 @@ model UserKVStore {
 
     @@unique([accountId, key])
     @@index([accountId])
+}
+
+//
+// Jobs (On-Demand Work)
+//
+
+enum JobStatus {
+    pending
+    queued
+    running
+    completed
+    failed
+    cancelled
+}
+
+enum JobType {
+    claude
+    codex
+}
+
+model Job {
+    id              String   @id @default(cuid())
+    accountId       String
+    account         Account  @relation(fields: [accountId], references: [id])
+    sessionId       String?  // Optional link to session if created from session context
+    session         Session? @relation(fields: [sessionId], references: [id])
+    type            JobType
+    status          JobStatus @default(pending)
+    priority        Int      @default(0)
+    config          String   // Encrypted - job configuration (mode, model, cwd, etc.)
+    input           String   // Encrypted - job input/prompt
+    output          String?  // Encrypted - job result/output
+    error           String?  // Encrypted - error message if failed
+    metadata        Json?    // Unencrypted metadata (working directory flags, etc.)
+    machineId       String?  // Which machine should execute this job
+    timeoutMs       Int?     // Timeout in milliseconds (null = use default)
+    timeoutAt       DateTime? // Calculated timeout deadline
+    retryCount      Int      @default(0) // Number of retries attempted
+    maxRetries      Int      @default(3) // Maximum number of retries
+    retryAfter      DateTime? // When to retry (for backoff)
+    createdAt       DateTime @default(now())
+    startedAt       DateTime?
+    completedAt     DateTime?
+    updatedAt       DateTime @updatedAt
+
+    @@index([accountId])
+    @@index([accountId, status])
+    @@index([machineId, status])
+    @@index([accountId, createdAt(sort: Desc)])
+    @@index([status, retryAfter])
+    @@index([status, timeoutAt])
 }

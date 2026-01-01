@@ -152,6 +152,49 @@ export type UpdateEvent = {
         value: string | null; // null indicates deletion
         version: number; // -1 for deleted keys
     }>;
+} | {
+    type: 'new-job';
+    jobId: string;
+    accountId: string;
+    jobType: 'claude' | 'codex';
+    status: 'pending' | 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+    priority: number;
+    metadata: any;
+    machineId: string | null;
+    sessionId: string | null;
+    createdAt: number;
+    updatedAt: number;
+    startedAt?: number;
+    completedAt?: number;
+} | {
+    type: 'update-job';
+    jobId: string;
+    jobType: 'claude' | 'codex';
+    status: 'pending' | 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+    priority: number;
+    metadata: any;
+    machineId: string | null;
+    sessionId: string | null;
+    createdAt: number;
+    updatedAt: number;
+    startedAt?: number;
+    completedAt?: number;
+} | {
+    type: 'delete-job';
+    jobId: string;
+} | {
+    type: 'job-update';
+    jobId: string;
+    jobType: 'claude' | 'codex';
+    status: 'pending' | 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+    priority: number;
+    metadata: any;
+    machineId: string | null;
+    sessionId: string | null;
+    createdAt: number;
+    updatedAt: number;
+    startedAt?: number;
+    completedAt?: number;
 };
 
 // === EPHEMERAL EVENT TYPES (Transient) ===
