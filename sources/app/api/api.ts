@@ -22,6 +22,7 @@ import { userRoutes } from "./routes/userRoutes";
 import { feedRoutes } from "./routes/feedRoutes";
 import { kvRoutes } from "./routes/kvRoutes";
 import { jobRoutes } from "./routes/jobRoutes";
+import { mcpRoutes } from "./routes/mcpRoutes";
 
 export async function startApi() {
 
@@ -68,6 +69,7 @@ export async function startApi() {
     feedRoutes(typed);
     kvRoutes(typed);
     jobRoutes(typed);
+    mcpRoutes(typed);
 
     // Start HTTP 
     const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3005;
